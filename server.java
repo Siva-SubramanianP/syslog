@@ -93,16 +93,16 @@ public class server {
     }
     public static String priority(String msg){
         String pri="";
-        if(msg.toLowerCase().indexOf("ERROR".toLowerCase()) != -1){
+        if(msg.toLowerCase().indexOf("error") != -1){
             pri = pri + "ERROR";
         }
-        else if(msg.toLowerCase().indexOf("Warning".toLowerCase()) != -1){
+        else if(msg.toLowerCase().indexOf("warning") != -1){
             pri = pri + "WARNING";
         }
-        else if(msg.toLowerCase().indexOf("Immediate".toLowerCase()) != -1){
+        else if(msg.toLowerCase().indexOf("immediate") != -1){
             pri = pri + "ALERTS";
         }
-        else if(msg.toLowerCase().indexOf("Urgent".toLowerCase()) != -1){
+        else if(msg.toLowerCase().indexOf("urgent") != -1){
             pri = pri + "EMERGENCY";
         }
         else{
