@@ -1,0 +1,21 @@
+2024/03/25 17:35:57 /127.0.0.1 5004 INFO Hi from 5
+2024/03/25 17:36:08 /127.0.0.1 5004 ALERTS immediate access the id
+2024/03/25 17:36:12 /127.0.0.1 5004 ERROR error message
+2024/03/25 17:36:14 /127.0.0.1 5004 INFO over
+2024/03/25 17:36:35 /127.0.0.1 5003 WARNING warning message was seen by third party
+2024/03/25 17:36:46 /127.0.0.1 5003 ALERTS immediate check the network
+2024/03/25 17:36:52 /127.0.0.1 5003 ERROR error 404found
+2024/03/25 17:36:54 /127.0.0.1 5003 INFO over
+2024/03/25 17:36:59 /127.0.0.1 5002 INFO hi from 3
+2024/03/25 17:37:08 /127.0.0.1 5002 ERROR get message error
+2024/03/25 17:37:19 /127.0.0.1 5002 WARNING warning solve the issue
+2024/03/25 17:37:21 /127.0.0.1 5002 INFO over
+2024/03/25 17:37:27 /127.0.0.1 5001 INFO Hi from 2
+2024/03/25 17:37:28 /127.0.0.1 5001 ERROR Error message
+2024/03/25 17:37:28 /127.0.0.1 5001 ALERTS immediate check the log
+2024/03/25 17:37:29 /127.0.0.1 5001 EMERGENCY file needed urgent
+2024/03/25 17:37:30 /127.0.0.1 5001 INFO over
+2024/03/25 17:37:36 /127.0.0.1 5000 INFO hi from 1
+2024/03/25 17:37:37 /127.0.0.1 5000 ERROR warning this cause error
+2024/03/25 17:37:37 /127.0.0.1 5000 ALERTS immediate file action needed
+2024/03/25 17:37:38 /127.0.0.1 5000 INFO over
