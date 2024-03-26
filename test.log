@@ -1,0 +1,5 @@
+<3>Mar 26 13:25:10 /127.0.0.1 5000 dameon.ERROR: Error handles
+<4>Mar 26 13:25:11 /127.0.0.1 5000 dameon.WARNING: Warning attention needed
+<1>Mar 26 13:25:22 /127.0.0.1 5000 dameon.ALERTS: immediate access needed 
+<0>Mar 26 13:25:32 /127.0.0.1 5000 dameon.EMERGENCY: urgent call the client now
+<6>Mar 26 13:25:34 /127.0.0.1 5000 dameon.INFO: over
