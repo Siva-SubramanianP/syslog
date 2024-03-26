@@ -18,13 +18,13 @@ public class server {
                 Thread clientThread = new Thread(() -> {
                     while (true) {
                         try {
-                            Socket clientSocket = server.accept();
-                            System.out.println("Connection accepted from " + clientSocket.getInetAddress() + " on port " + port);
+                            Socket socket = server.accept();
+                            System.out.println("Connection accepted from " + socket.getInetAddress() + " on port " + port);
                             incrementActiveConnections();
 
                             Thread clientHandlerThread = new Thread(() -> {
                                 try {
-                                    web(clientSocket, port,file);
+                                    web(socket, port,file);
                                 } catch (IOException e){
                                     e.printStackTrace();
                                 }
