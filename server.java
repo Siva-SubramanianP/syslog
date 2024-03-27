@@ -51,16 +51,6 @@ public class server {
             DataInputStream in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
             
             String input="";
-            // while(!input.equals("over")){
-            //     try {
-            //         input = in.readUTF();
-            //         // System.out.println(input);
-            //         String inputLine= format(input,client,port);
-            //         file.write(inputLine);
-            //     } catch (Exception e) {
-            //         System.out.println(e);
-            //     }
-            // }
             while(true){
                 input = in.readUTF();
                 if(input.equals("stop")){
