@@ -9,7 +9,6 @@ public class server {
     static BlockingQueue<String> queue = new ArrayBlockingQueue<>(10);
     public static void main(String[] args) throws IOException {
         int[] ports = {5000, 5001, 5002, 5003, 5004};
-        // FileWriter file = new FileWriter("D:\\Learning\\syslog\\test1.log");
         ExecutorService exe = Executors.newFixedThreadPool(5);
 
         server ser = new server();
