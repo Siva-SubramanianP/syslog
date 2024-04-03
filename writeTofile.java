@@ -9,16 +9,12 @@ public class writeTofile extends Thread{
                 try {
                     String addFile = server.queue.take();
                     file.write(addFile);
-                    // System.out.println(addFile);
                 } catch (IOException | InterruptedException e) {   
                     e.printStackTrace();
                 }
             }
-            
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
-
