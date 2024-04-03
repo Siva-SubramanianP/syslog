@@ -29,7 +29,6 @@ public class client1 extends Thread {
                 else{
                     try {
                         out.writeUTF(inputs[index]);
-                        // Thread.sleep(10);
                     } catch (IOException e) {    
                         e.printStackTrace();
                     }
