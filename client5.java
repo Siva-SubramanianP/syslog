@@ -1,60 +1,49 @@
 import java.io.*;
 import java.net.*;
-import java.util.Random;
 
-public class client5 {
-    Socket socket = null;
-    DataInputStream in = new DataInputStream(System.in);
-    DataOutputStream out = null ;
+public class client5 extends Thread {
 
-    @SuppressWarnings("deprecation")
-    public client5(String address, int port){
+    server server;
+    
+    public client5(server server) {
+        this.server = server;
+    }
+    public void run() {
+        Socket socket = null;
+        DataOutputStream out = null;
+
         try {
-            socket = new Socket(address,port);
-            System.out.println("Socket Connected");
+            socket = new Socket("127.0.0.1", 5004);
+            System.out.println("Socket Connected Client 5");
             out = new DataOutputStream(socket.getOutputStream());
 
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        String[] inputs = {"error occur while running","warning process still in buildup","urgent call the clients","immediate action need to be taken","error occur while handling script","warning file is not opened","immediate switch the network as public","Hi normal message","urgent help needed from the team","urgent help needed to the file server","warning the file is opened","error handle the exception","error process the thread sequentially","warning this takes too much time","urgent modify server to function efficiently","immediate alert the process thread","error occur in the client","immediate alert the file","error handle the thread correctly","immediate solve the problem","urgent call the clients"};  
-        Random random = new Random();
-        while(true){
-            int index = random.nextInt(21);
-            
-            System.out.println(index);
-            if(inputs[index].equals("over")){
-                break;
-            }
-            else{
-                try {
-                    out.writeUTF(inputs[index]);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            String[] inputs = {"error occur while running","warning process still in buildup","urgent call the clients","immediate action need to be taken","error occur while handling script","warning file is not opened","immediate switch the network as public","Hi normal message","urgent help needed from the team","urgent help needed to the file server","warning the file is opened","error handle the exception","error process the thread sequentially","warning this takes too much time","urgent modify server to function efficiently","immediate alert the process thread","error occur in the client","immediate alert the file","error handle the thread correctly","immediate solve the problem","urgent call the clients","over"};  
+            int index = 0;
+            while(true){
+                if(index > 4){
+                    index =0;
                 }
+                if(inputs[index].equals("over")){
+                    break;
+                }
+                else{
+                    try {
+                        out.writeUTF(inputs[index]);
+                    } catch (IOException e) {    
+                        e.printStackTrace();
+                    }
+                }
+                index++;
             }
-        }
-        try {
-            String line=in.readLine();
-            out.writeUTF(line);
+            System.out.println("Client 5 finished sending messages");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
         try {
-            socket.close();
-            in.close();
             out.close();
-        } catch (Exception e) {
-            System.out.println(e);
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-
-    public static void main(String[] args) {
-        @SuppressWarnings("unused")
-        client5 client = new client5("localhost",5004);
-    }
-
-
 }
