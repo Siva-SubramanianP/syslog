@@ -2,144 +2,140 @@ import java.io.*;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.*;
 
 public class server {
-    static volatile int ActiveConnections=0;
-    @SuppressWarnings("resource")
-    public static void main(String[] args) throws IOException{
-        int ports[] = {5000,5001,5002,5003,5004};
-        // int ports[] = {5000,5001};
-        FileWriter file = new FileWriter("D:\\Learning\\syslog\\test2.log");
-        try{
-            for(int port : ports){
-                ServerSocket server = new ServerSocket(port);
-                System.out.println("Server Started for the port "+port);
-                
-                Thread clientThread = new Thread(() -> {
-                    while (true) {
-                        try {
-                            Socket socket = server.accept();
-                            System.out.println("Connection accepted from " + socket.getInetAddress() + " on port " + port);
-                            incrementActiveConnections();
+    static int activeConnections = 0;
+    static BlockingQueue<String> queue = new ArrayBlockingQueue<>(10);
+    public static void main(String[] args) throws IOException {
+        int[] ports = {5000, 5001, 5002, 5003, 5004};
+        // FileWriter file = new FileWriter("D:\\Learning\\syslog\\test1.log");
+        ExecutorService exe = Executors.newFixedThreadPool(5);
 
-                            Thread clientHandlerThread = new Thread(() -> {
-                                try {
-                                    if(port == 5000){
-                                        Thread.currentThread().setName("Client1");
-                                    }
-                                    else if(port == 5001){
-                                        Thread.currentThread().setName("Client2");
-                                    }
-                                    else if(port == 5002){
-                                        Thread.currentThread().setName("Client3");
-                                    }
-                                    else if(port == 5003){
-                                        Thread.currentThread().setName("Client4");
-                                    }
-                                    else{
-                                        Thread.currentThread().setName("Client5");
-                                    }
-                                    String name=Thread.currentThread().getName();
-                                    web(socket,port,file,name);
-                                } catch (IOException e){
-                                    e.printStackTrace();
+        server ser = new server();
+        client1 client1 = new client1(ser);
+        client2 client2 = new client2(ser);
+        client3 client3 = new client3(ser);
+        client4 client4 = new client4(ser);
+        client5 client5 = new client5(ser);
+
+        client1.start();
+        client2.start();
+        client3.start();
+        client4.start();
+        client5.start();
+
+        writeTofile t1 = new writeTofile();
+        t1.start();
+
+        for (int port : ports) {
+            startServer(port,exe);
+        }
+    }
+
+    public static void startServer(int port,ExecutorService exe) {
+        exe.execute(() -> {
+            try (ServerSocket server = new ServerSocket(port)) {
+                System.out.println("Server Started for the port " + port);
+                    try {
+                        Socket socket = server.accept();
+                        System.out.println("Connection accepted from " + socket.getInetAddress() + " on port " + port);
+                        incrementActiveConnections();                            
+                        exe.execute(() -> {
+                            try {
+                                if(port == 5000){
+                                    Thread.currentThread().setName("Client1");
                                 }
-                            });
-                            clientHandlerThread.start();
-                            // num++;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                                else if(port == 5001){
+                                    Thread.currentThread().setName("Client2");
+                                }
+                                else if(port == 5002){
+                                    Thread.currentThread().setName("Client3");
+                                }
+                                else if(port == 5003){
+                                    Thread.currentThread().setName("Client4");
+                                }
+                                else{
+                                    Thread.currentThread().setName("Client5");
+                                }
+                                String name=Thread.currentThread().getName();
+                                handleClient(socket, port,name);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                });
-                clientThread.start();
-                
-                
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static void handleClient(Socket client, int port,String name) throws IOException {
+        try (DataInputStream in = new DataInputStream(new BufferedInputStream(client.getInputStream()))) {
+        String input;
+        while (true) {
+            input = in.readUTF();
+            if (input.equals("stop")) {
+                break;
+            } else {
+                String formattedInput = format(input, client, port, name);
+                queue.offer(formattedInput);
             }
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        // file.close();
-    }
-    @SuppressWarnings("resource")
-    public static void web(Socket client,int port,FileWriter file,String name) throws IOException{
-        try {
-            DataInputStream in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
-            
-            String input="";
-
-            while(true){
-                input = in.readUTF();
-                if(input.equals("stop")){
-                    break;
-                }
-                else{
-                    String inputLine= format(input,client,port,name);
-                    file.write(inputLine);
-                }  
-            }
-            in.close();
-            client.close();
-
-            decrementActiveConnections();
-
-            if(ActiveConnections == 0){
-                System.out.println("Server Terminated...");
-                file.close();
-                System.exit(0);
-            }
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        // file.close();
-
-    }
-    public static void incrementActiveConnections(){
-        ActiveConnections++;
-    }
-
-    public static void decrementActiveConnections(){
-        ActiveConnections--;
-    }
-    public static String format(String msg,Socket client,int port,String name){
+        in.close();
+        client.close();
+        decrementActiveConnections();
         
-        // int pv;
+        if (activeConnections == 0) {
+            System.out.println("Server Terminated...");
+            System.exit(0);
+        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    
+    }
+
+    public static void incrementActiveConnections() {
+        activeConnections++;
+    }
+
+    public static void decrementActiveConnections() {
+        activeConnections--;
+    }
+
+    public static String format(String msg, Socket client, int port, String name) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        String pri[] = priority(msg);
-        String output ="<"+pri[1]+">"+ String.valueOf(dtf.format(now))+" "+client.getInetAddress()+" "+port+" "+name+" "+"dameon."+pri[0]+": "+ msg + "\n";
-        return output;
+        String[] pri = priority(msg);
+        // return "<" + pri[1] + ">" + dtf.format(now) + " " + client.getInetAddress() + " " + port + " " +"Received from "+name+" Writing "+writeTofile.name + " " + "dameon." + pri[0] + ": " + msg + "\n";
+        return "<" + pri[1] + "> " + dtf.format(now) + " " + client.getInetAddress() + " " + port + " " +writeTofile.name + " " + "dameon." + pri[0] + ": " + msg + "\n";
     }
+
     public static String[] priority(String msg){
-        String pri="";
+        String pri = "";
         int pv;
-        String ans[] = new String[2];
-        if(msg.toLowerCase().indexOf("error") != -1){
-            pri = pri + "ERROR";
-            pv=3;
-        }
-        else if(msg.toLowerCase().indexOf("warning") != -1){
-            pri = pri + "WARNING";
-            pv=4;
-        }
-        else if(msg.toLowerCase().indexOf("immediate") != -1){
-            pri = pri + "ALERTS";
-            pv=1;
-        }
-        else if(msg.toLowerCase().indexOf("urgent") != -1){
-            pri = pri + "EMERGENCY";
-            pv=0;
-        }
-        else{
-            pri = pri + "INFO";
-            pv=6;
+        String[] ans = new String[2];
+        if (msg.toLowerCase().contains("error")) {
+            pri = "ERROR";
+            pv = 3;
+        } else if (msg.toLowerCase().contains("warning")) {
+            pri = "WARNING";
+            pv = 4;
+        } else if (msg.toLowerCase().contains("immediate")) {
+            pri = "ALERTS";
+            pv = 1;
+        } else if (msg.toLowerCase().contains("urgent")) {
+            pri = "EMERGENCY";
+            pv = 0;
+        } else {
+            pri = "INFO";
+            pv = 6;
         }
         ans[0] = pri;
         ans[1] = String.valueOf(pv);
-
         return ans;
     }
 }
-
